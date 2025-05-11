@@ -18,7 +18,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace = "com.dailyprayer.routine"
-    compileSdk = 34
+    compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
@@ -44,8 +44,8 @@ android {
         applicationId = "com.dailyprayer.routine"
         minSdk = 23
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.0.1"
+        versionCode = 4
+        versionName = "1.0.2"
     }
 
     buildTypes {

@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../services/openai_service.dart';
 import '../services/local_scripture_service.dart';
 import 'my_prayers_screen.dart';
+import '../models/prayer_card.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +20,13 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isGenerating = false;
   Future<SharedPreferences>? _prefsFuture;
   final List<String> _prayers = [];
+
+  // [다국어 드롭다운] 언어 상태 변수 추가
+  String selectedLanguage = 'ko';
+
+  // [Supabase PrayerCard 상태 변수 추가]
+  List<PrayerCard> _cards = [];
+  int _currentCardIndex = 0;
 
   final List<String> _emotions = [
     '기쁨',
@@ -37,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _prefsFuture = SharedPreferences.getInstance();
+    _fetchPrayerCards();
   }
 
   @override
@@ -184,6 +194,19 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _fetchPrayerCards() async {
+    final response = await Supabase.instance.client
+        .from('daily_prayers')
+        .select('*')
+        .order('id', ascending: true);
+    final List<PrayerCard> loadedCards =
+        (response as List).map((e) => PrayerCard.fromJson(e)).toList();
+    setState(() {
+      _cards = loadedCards;
+      _currentCardIndex = 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -191,7 +214,6 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFFB2EBF2),
         elevation: 0,
         centerTitle: true,
-        title: const Text('매일 기도 루틴', style: TextStyle(color: Colors.black)),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: LocalScriptureService.loadScriptures(),
@@ -208,14 +230,57 @@ class _HomeScreenState extends State<HomeScreen> {
           final scriptures = snapshot.data!;
 
           // 오늘의 말씀을 가져옴 (간단하게 첫 번째 항목 사용)
-          final todayItem =
-              scriptures.isNotEmpty ? scriptures[0] : <String, dynamic>{};
+          final PrayerCard? todayCard =
+              _cards.isNotEmpty ? _cards[_currentCardIndex] : null;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // [상단 타이틀+언어 드롭다운 Row 추가]
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '매일 기도 루틴',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    DropdownButton<String>(
+                      value: selectedLanguage,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedLanguage = newValue!;
+                        });
+                      },
+                      items:
+                          <String>[
+                            'ko',
+                            'en',
+                            'ja',
+                            'zh',
+                            'es',
+                          ].map<DropdownMenuItem<String>>((String lang) {
+                            return DropdownMenuItem<String>(
+                              value: lang,
+                              child: Text(
+                                {
+                                  'ko': '한국어',
+                                  'en': 'English',
+                                  'ja': '日本語',
+                                  'zh': '中文',
+                                  'es': 'Español',
+                                }[lang]!,
+                              ),
+                            );
+                          }).toList(),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 // 오늘의 말씀 섹션
                 Card(
                   elevation: 4,
@@ -229,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '📌 ${todayItem['theme_ko'] ?? ''}',
+                          '📌 ${todayCard?.getTheme(selectedLanguage) ?? ''}',
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -237,7 +302,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          todayItem['verse_ko'] ?? '',
+                          todayCard?.getVerse(selectedLanguage) ?? '',
                           style: const TextStyle(height: 1.4),
                         ),
                       ],
@@ -265,7 +330,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          todayItem['prayer_ko'] ?? '여기에 예시 기도문이 표시됩니다.',
+                          todayCard?.getPrayer(selectedLanguage) ??
+                              '여기에 예시 기도문이 표시됩니다.',
                           style: const TextStyle(height: 1.4),
                         ),
                         const SizedBox(height: 20), // 크기 증가

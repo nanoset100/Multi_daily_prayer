@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 void showTestNotification() {
   AwesomeNotifications().createNotification(
@@ -18,6 +19,11 @@ void showTestNotification() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey:
+        dotenv.env['SUPABASE_ANON_KEY']!,
+  );
 
   // 알림 서비스 초기화
   NotificationService.initialize();
