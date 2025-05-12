@@ -5,6 +5,7 @@ import '../services/openai_service.dart';
 import 'my_prayers_screen.dart';
 import '../models/prayer_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -43,11 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
     '위로',
   ];
 
+  Map<String, dynamic>? _labels;
+
   @override
   void initState() {
     super.initState();
     _prefsFuture = SharedPreferences.getInstance();
     _fetchPrayerCards();
+    _loadLabelsByLocale();
   }
 
   @override
@@ -117,6 +121,10 @@ class _HomeScreenState extends State<HomeScreen> {
       final generatedPrayer = await OpenAIService.generatePrayer(
         _prayerController.text,
         _selectedEmotion!,
+        selectedLanguage,
+        _cards.isNotEmpty
+            ? (_cards[_currentCardIndex].getVerse(selectedLanguage) ?? '')
+            : '',
       );
 
       if (!mounted) return;
@@ -220,6 +228,26 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _loadLabelsByLocale({String? forceLang}) async {
+    final jsonStr = await rootBundle.loadString(
+      'assets/daily_prayer_ui_labels.json',
+    );
+    final Map<String, dynamic> allLabels = json.decode(jsonStr);
+    String langCode =
+        forceLang ??
+        WidgetsBinding.instance.platformDispatcher.locale.languageCode;
+    if (!allLabels.containsKey(langCode)) {
+      langCode = 'ko';
+    }
+    setState(() {
+      selectedLanguage = langCode;
+      _labels = allLabels[langCode];
+    });
+    print(
+      '✅ Locale 강제 적용: $langCode, labels loaded: ${_labels?.keys.toList().toString() ?? 'null'}',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -234,7 +262,7 @@ class _HomeScreenState extends State<HomeScreen> {
               : _loadError != null
               ? Center(child: Text(_loadError!))
               : _cards.isEmpty
-              ? const Center(child: Text('말씀 데이터가 없습니다.'))
+              ? Center(child: Text(_labels?['no_verse'] ?? '말씀 데이터가 없습니다.'))
               : SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
@@ -244,19 +272,26 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          '매일 기도 루틴',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
+                        Flexible(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              _labels?['app_title'] ?? '매일 기도 루틴',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: false,
+                            ),
                           ),
                         ),
                         DropdownButton<String>(
                           value: selectedLanguage,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedLanguage = newValue!;
-                            });
+                          onChanged: (String? newValue) async {
+                            if (newValue != null) {
+                              await _loadLabelsByLocale(forceLang: newValue);
+                            }
                           },
                           items:
                               <String>[
@@ -326,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              '🙏 예시 기도문',
-                              style: TextStyle(
+                            Text(
+                              _labels?['example_prayer'] ?? '🙏 예시 기도문',
+                              style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -338,7 +373,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               _cards[_currentCardIndex].getPrayer(
                                     selectedLanguage,
                                   ) ??
-                                  '여기에 예시 기도문이 표시됩니다.',
+                                  (_labels?['example_prayer_placeholder'] ??
+                                      '여기에 예시 기도문이 표시됩니다.'),
                               style: const TextStyle(height: 1.4),
                             ),
                             const SizedBox(height: 20), // 크기 증가
@@ -350,11 +386,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     // 감정 드롭다운
                     DropdownButtonFormField<String>(
                       value: _selectedEmotion,
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
+                      dropdownColor: Colors.white,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: Colors.white,
-                        labelText: '감정 선택',
-                        hintText: '지금의 감정 상태를 선택해주세요',
+                        labelText: _labels?['emotion_selection'] ?? '감정 선택',
+                        hintText:
+                            _labels?['select_emotion_prompt'] ??
+                            '지금의 감정 상태를 선택해 주세요',
+                        labelStyle: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
+                        hintStyle: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black,
+                        ),
                         contentPadding: const EdgeInsets.symmetric(
                           vertical: 12,
                           horizontal: 16,
@@ -365,23 +413,37 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       items:
-                          _emotions.map((String emotion) {
-                            return DropdownMenuItem<String>(
-                              value: emotion,
-                              child: Text(emotion),
-                            );
-                          }).toList(),
+                          (_labels?['emotions'] as List<dynamic>? ?? _emotions)
+                              .map(
+                                (e) => DropdownMenuItem<String>(
+                                  value: e.toString(),
+                                  child: Text(
+                                    e.toString(),
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                              .toList(),
                       onChanged: (String? newValue) {
                         setState(() {
                           _selectedEmotion = newValue;
                         });
                       },
                     ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                       child: Text(
-                        '내 감정을 선택한 후 상황에 맞게 적어보세요',
-                        style: TextStyle(fontSize: 13, color: Colors.grey),
+                        _labels?['select_emotion_prompt'] ??
+                            '내 감정을 선택한 후 상황에 맞게 적어보세요',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -391,7 +453,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       minLines: 3,
                       maxLines: 5,
                       decoration: InputDecoration(
-                        hintText: '당신의 기도를 여기에 적어주세요...',
+                        hintText:
+                            _labels?['input_prayer_placeholder'] ??
+                            '당신의 기도를 여기에 적어주세요...',
                         filled: true,
                         fillColor: Colors.white,
                         contentPadding: const EdgeInsets.symmetric(
@@ -422,7 +486,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     )
                                     : const Icon(Icons.auto_awesome),
                             label: Text(
-                              _isGenerating ? '생성 중...' : '✨🙏 AI 도움받기',
+                              _isGenerating
+                                  ? (_labels?['ai_help_button'] ?? '생성 중...')
+                                  : '✨🙏 ${_labels?['ai_help_button'] ?? 'AI 도움받기'}',
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFB2EBF2),
@@ -437,11 +503,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ? null
                                     : () async {
                                       if (_prayerController.text.isEmpty) {
-                                        _showMessage('기도 내용을 입력해주세요');
+                                        _showMessage(
+                                          _labels?['input_prayer_placeholder'] ??
+                                              '기도 내용을 입력해주세요',
+                                        );
                                         return;
                                       }
                                       if (_selectedEmotion == null) {
-                                        _showMessage('감정을 선택해주세요');
+                                        _showMessage(
+                                          _labels?['select_emotion_prompt'] ??
+                                              '감정을 선택해주세요',
+                                        );
                                         return;
                                       }
                                       setState(() {
@@ -452,6 +524,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             await OpenAIService.generatePrayer(
                                               _prayerController.text,
                                               _selectedEmotion!,
+                                              selectedLanguage,
+                                              _cards.isNotEmpty
+                                                  ? (_cards[_currentCardIndex]
+                                                          .getVerse(
+                                                            selectedLanguage,
+                                                          ) ??
+                                                      '')
+                                                  : '',
                                             );
                                         if (!mounted) return;
                                         final originalInput =
@@ -461,8 +541,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                           barrierDismissible: false,
                                           builder:
                                               (context) => AlertDialog(
-                                                title: const Text(
-                                                  'AI가 생성한 기도문',
+                                                title: Text(
+                                                  _labels?['ai_help_button'] ??
+                                                      'AI가 생성한 기도문',
                                                 ),
                                                 content: SingleChildScrollView(
                                                   child: Column(
@@ -472,23 +553,17 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         CrossAxisAlignment
                                                             .start,
                                                     children: [
-                                                      const Text(
-                                                        '원래 입력:',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
+                                                      Text(
+                                                        _labels?['input_prayer_placeholder'] ??
+                                                            '원래 입력:',
                                                       ),
                                                       Text(originalInput),
                                                       const SizedBox(
                                                         height: 16,
                                                       ),
-                                                      const Text(
-                                                        'AI 생성 기도문:',
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
+                                                      Text(
+                                                        _labels?['ai_help_button'] ??
+                                                            'AI 생성 기도문:',
                                                       ),
                                                       Text(generatedPrayer),
                                                     ],
@@ -501,7 +576,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         context,
                                                       ).pop();
                                                     },
-                                                    child: const Text('취소'),
+                                                    child: Text(
+                                                      _labels?['save_button'] ??
+                                                          '취소',
+                                                    ),
                                                   ),
                                                   TextButton(
                                                     onPressed: () {
@@ -511,16 +589,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         context,
                                                       ).pop();
                                                       _showMessage(
-                                                        'AI 기도문이 적용되었습니다',
+                                                        _labels?['ai_help_button'] ??
+                                                            'AI 기도문이 적용되었습니다',
                                                       );
                                                     },
-                                                    child: const Text('사용하기'),
+                                                    child: Text(
+                                                      _labels?['ai_help_button'] ??
+                                                          '사용하기',
+                                                    ),
                                                   ),
                                                 ],
                                               ),
                                         );
                                       } catch (e) {
-                                        _showMessage('기도문 생성 오류: $e');
+                                        _showMessage(
+                                          _labels?['ai_help_button'] ??
+                                              '기도문 생성 오류: $e',
+                                        );
                                       } finally {
                                         if (mounted) {
                                           setState(() {
@@ -541,8 +626,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.save,
                                   color: Colors.black,
                                 ),
-                                label: const Text(
-                                  '저장하기',
+                                label: Text(
+                                  _labels?['save_button'] ?? '저장하기',
                                   style: TextStyle(color: Colors.black),
                                 ),
                                 style: ElevatedButton.styleFrom(
@@ -600,10 +685,25 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Icons.menu_book,
                                   color: Colors.black,
                                 ),
-                                label: const Text(
-                                  '내 기도문 보기',
-                                  style: TextStyle(color: Colors.black),
-                                ),
+                                label:
+                                    selectedLanguage == 'en'
+                                        ? Center(
+                                          child: Text(
+                                            _labels?['my_prayers_button'] ??
+                                                'View My Prayers',
+                                            style: const TextStyle(
+                                              color: Colors.black,
+                                            ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        )
+                                        : Text(
+                                          _labels?['my_prayers_button'] ??
+                                              '내 기도문 보기',
+                                          style: const TextStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.grey[300],
                                   foregroundColor: Colors.black,
@@ -616,7 +716,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder:
-                                          (context) => const MyPrayersScreen(),
+                                          (context) =>
+                                              MyPrayersScreen(labels: _labels),
                                     ),
                                   );
                                 },
@@ -679,11 +780,15 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
             value: _selectedEmotion,
+            style: const TextStyle(color: Colors.black, fontSize: 16),
+            dropdownColor: Colors.white,
             decoration: InputDecoration(
               filled: true,
               fillColor: Colors.white,
               labelText: '감정 선택',
               hintText: '지금의 감정 상태를 선택해주세요',
+              labelStyle: const TextStyle(fontSize: 16, color: Colors.black),
+              hintStyle: const TextStyle(fontSize: 16, color: Colors.black),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 12,
                 horizontal: 16,
@@ -728,6 +833,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             await OpenAIService.generatePrayer(
                               _prayerController.text,
                               _selectedEmotion!,
+                              selectedLanguage,
+                              _cards.isNotEmpty
+                                  ? (_cards[_currentCardIndex].getVerse(
+                                        selectedLanguage,
+                                      ) ??
+                                      '')
+                                  : '',
                             );
                         if (!mounted) return;
                         final originalInput = _prayerController.text;

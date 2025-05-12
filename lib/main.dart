@@ -4,6 +4,8 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 
 void showTestNotification() {
   AwesomeNotifications().createNotification(
@@ -19,10 +21,18 @@ void showTestNotification() {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
+  // JSON 파일 로드 테스트
+  final jsonStr = await rootBundle.loadString(
+    'assets/daily_prayer_ui_labels.json',
+  );
+  final Map<String, dynamic> labels = json.decode(jsonStr);
+  print(
+    '✅ daily_prayer_ui_labels.json loaded: '
+    'keys = \\${labels.keys.toList()}',
+  );
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
-    anonKey:
-        dotenv.env['SUPABASE_ANON_KEY']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
   // 알림 서비스 초기화

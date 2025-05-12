@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyPrayersScreen extends StatefulWidget {
-  const MyPrayersScreen({super.key});
+  final Map<String, dynamic>? labels;
+  const MyPrayersScreen({super.key, this.labels});
 
   @override
   State<MyPrayersScreen> createState() => _MyPrayersScreenState();
@@ -46,13 +47,16 @@ class _MyPrayersScreenState extends State<MyPrayersScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final labels = widget.labels;
     return Scaffold(
-      appBar: AppBar(title: const Text('내 기도문 모아보기')),
+      appBar: AppBar(title: Text(labels?['my_prayers_page'] ?? '내 기도문 모아보기')),
       body:
           _isLoading
               ? const Center(child: CircularProgressIndicator())
               : _prayers.isEmpty
-              ? const Center(child: Text('저장된 기도문이 없습니다.'))
+              ? Center(
+                child: Text(labels?['my_prayers_empty'] ?? '저장된 기도문이 없습니다.'),
+              )
               : ListView.builder(
                 padding: const EdgeInsets.all(16),
                 itemCount: _prayers.length,
