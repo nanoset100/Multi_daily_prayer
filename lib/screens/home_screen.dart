@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/openai_service.dart';
+import '../services/stats_service.dart';
 import 'my_prayers_screen.dart';
+import 'my_stats_screen.dart';
 import '../models/prayer_card.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/services.dart';
@@ -51,7 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     _prefsFuture = SharedPreferences.getInstance();
     _fetchPrayerCards();
-    _loadLabelsByLocale();
+    _initLanguage();
+    _updateStats(); // Initialize stats tracking
   }
 
   @override
@@ -243,9 +246,32 @@ class _HomeScreenState extends State<HomeScreen> {
       selectedLanguage = langCode;
       _labels = allLabels[langCode];
     });
+
+    // SharedPreferences에 선택한 언어 저장 (앱 전체에서 일관성 유지)
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedLanguage', langCode);
+
     print(
       '✅ Locale 강제 적용: $langCode, labels loaded: ${_labels?.keys.toList().toString() ?? 'null'}',
     );
+  }
+
+  Future<void> _updateStats() async {
+    await StatsService.updateStatsOnAppOpen();
+  }
+
+  // 앱 시작 시 언어 설정 초기화
+  Future<void> _initLanguage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedLanguage = prefs.getString('selectedLanguage');
+
+    if (savedLanguage != null) {
+      // 저장된 언어 설정이 있으면 사용
+      await _loadLabelsByLocale(forceLang: savedLanguage);
+    } else {
+      // 없으면 기본 설정 사용
+      await _loadLabelsByLocale();
+    }
   }
 
   @override
@@ -718,6 +744,38 @@ class _HomeScreenState extends State<HomeScreen> {
                                       builder:
                                           (context) =>
                                               MyPrayersScreen(labels: _labels),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: ElevatedButton.icon(
+                                icon: const Icon(
+                                  Icons.bar_chart,
+                                  color: Colors.black,
+                                ),
+                                label: Text(
+                                  _labels?['my_stats_button'] ?? '나의 기록',
+                                  style: const TextStyle(color: Colors.black),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.grey[200],
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                    horizontal: 16,
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) => const MyStatsScreen(),
                                     ),
                                   );
                                 },

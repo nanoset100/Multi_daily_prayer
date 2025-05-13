@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
+import 'services/stats_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
@@ -28,7 +29,7 @@ void main() async {
   final Map<String, dynamic> labels = json.decode(jsonStr);
   print(
     '✅ daily_prayer_ui_labels.json loaded: '
-    'keys = \\${labels.keys.toList()}',
+    'keys = \${labels.keys.toList()}',
   );
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
@@ -37,6 +38,9 @@ void main() async {
 
   // 알림 서비스 초기화
   NotificationService.initialize();
+
+  // 통계 초기화 - 앱이 시작될 때 초기화
+  await StatsService.updateStatsOnAppOpen();
 
   // Awesome Notifications 초기화
   AwesomeNotifications().initialize(null, [
