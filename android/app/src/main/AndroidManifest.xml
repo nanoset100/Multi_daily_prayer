@@ -4,11 +4,15 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/>
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- SCHEDULE_EXACT_ALARM 권한 제거 - Google Play 정책 위반 -->
+    <!-- <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/> -->
+    <!-- 대신 일반 알림 권한 사용 (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- USE_FULL_SCREEN_INTENT도 제거 - 불필요한 권한 -->
+    <!-- <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT"/> -->
     
     <application
-        android:label="매일 기도 루틴"
+        android:label="@string/app_name"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -16,18 +16,34 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// local.properties 로드
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties()
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
+// Flutter 버전 정보 가져오기
+val flutterVersionCode = localProperties.getProperty("flutter.versionCode")?.toIntOrNull() 
+    ?: System.getenv("FLUTTER_VERSION_CODE")?.toIntOrNull() 
+    ?: 1
+
+val flutterVersionName = localProperties.getProperty("flutter.versionName") 
+    ?: System.getenv("FLUTTER_VERSION_NAME") 
+    ?: "1.0.0"
+
 android {
     namespace = "com.dailyprayer.routine"
     compileSdk = 35
     ndkVersion = "27.0.12077973"
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     // 서명 설정 추가
@@ -43,9 +59,9 @@ android {
     defaultConfig {
         applicationId = "com.dailyprayer.routine"
         minSdk = 23
-        targetSdk = 34
-        versionCode = 5
-        versionName = "1.0.3"
+        targetSdk = 35
+        versionCode = flutterVersionCode
+        versionName = flutterVersionName
     }
 
     buildTypes {
@@ -53,7 +69,7 @@ android {
             // 릴리스 빌드에 서명 설정 적용
             signingConfig = signingConfigs.getByName("release")
             
-            // R8/ProGuard 설정 (빌드 문제로 일시적으로 비활성화)
+            // R8/ProGuard 설정 임시 비활성화 (빌드 안정성 우선)
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(

@@ -5,7 +5,7 @@ dependency_overrides:
 
 
 name: daily_prayer_new
-description: "A new Flutter project."
+description: "매일 기도 루틴 - AI 기능을 포함한 기도 습관 형성 앱. OpenAI 기술을 활용하여 기도문 작성을 도와주며, 모든 AI 기능은 투명하게 공개됩니다."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -22,7 +22,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.3+5
+version: 1.0.9+109
 
 environment:
   sdk: ^3.7.2
@@ -45,7 +45,7 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.20.2
   awesome_notifications: ^0.10.1
-  timezone: ^0.7.0
+  timezone: ^0.10.1
   supabase_flutter: ^2.9.0
   # sign_in_with_apple: ^5.0.0
 
