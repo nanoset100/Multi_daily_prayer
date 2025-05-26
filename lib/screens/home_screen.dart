@@ -239,21 +239,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    _prayerController.text =
-                        originalInput; // Restore original input
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('취소'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _prayerController.text = generatedPrayer;
-                    Navigator.of(context).pop();
-                    _showMessage('AI 기도문이 적용되었습니다');
-                  },
-                  child: const Text('사용하기'),
+                Center(
+                  child: TextButton(
+                    onPressed: () {
+                      _prayerController.text = generatedPrayer;
+                      Navigator.of(context).pop();
+                      _showMessage('AI 기도문이 적용되었습니다');
+                    },
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFFB2EBF2),
+                      foregroundColor: Colors.black,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text(
+                      '기도문 보충하기',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -806,32 +817,46 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   ),
                                                 ),
                                                 actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.of(
-                                                        context,
-                                                      ).pop();
-                                                    },
-                                                    child: Text(
-                                                      _labels?['save_button'] ??
-                                                          '취소',
-                                                    ),
-                                                  ),
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      _prayerController.text =
-                                                          generatedPrayer;
-                                                      Navigator.of(
-                                                        context,
-                                                      ).pop();
-                                                      _showMessage(
-                                                        _labels?['ai_help_button'] ??
-                                                            'AI 기도문이 적용되었습니다',
-                                                      );
-                                                    },
-                                                    child: Text(
-                                                      _labels?['ai_help_button'] ??
-                                                          '사용하기',
+                                                  Center(
+                                                    child: TextButton(
+                                                      onPressed: () {
+                                                        _prayerController.text =
+                                                            generatedPrayer;
+                                                        Navigator.of(
+                                                          context,
+                                                        ).pop();
+                                                        _showMessage(
+                                                          _labels?['ai_help_button'] ??
+                                                              'AI 기도문이 적용되었습니다',
+                                                        );
+                                                      },
+                                                      style: TextButton.styleFrom(
+                                                        backgroundColor:
+                                                            const Color(
+                                                              0xFFB2EBF2,
+                                                            ),
+                                                        foregroundColor:
+                                                            Colors.black,
+                                                        padding:
+                                                            const EdgeInsets.symmetric(
+                                                              horizontal: 32,
+                                                              vertical: 12,
+                                                            ),
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                8,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      child: const Text(
+                                                        '기도문 보충하기',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
                                                 ],
@@ -1225,19 +1250,40 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ),
                                 actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('취소'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      _prayerController.text = generatedPrayer;
-                                      Navigator.of(context).pop();
-                                      _showMessage('AI 기도문이 적용되었습니다');
-                                    },
-                                    child: const Text('사용하기'),
+                                  Center(
+                                    child: TextButton(
+                                      onPressed: () {
+                                        _prayerController.text =
+                                            generatedPrayer;
+                                        Navigator.of(context).pop();
+                                        _showMessage(
+                                          _labels?['ai_help_button'] ??
+                                              'AI 기도문이 적용되었습니다',
+                                        );
+                                      },
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: const Color(
+                                          0xFFB2EBF2,
+                                        ),
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 32,
+                                          vertical: 12,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        '기도문 보충하기',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
