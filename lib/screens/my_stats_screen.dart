@@ -67,11 +67,11 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selectedLanguage', langCode);
 
-      print(
+      debugPrint(
         '✅ 스탯 화면 언어 설정: $langCode, labels: ${_labels?.keys.length ?? 0}개 로드됨',
       );
     } catch (e) {
-      print('라벨 로딩 오류: $e');
+      debugPrint('라벨 로딩 오류: $e');
       // 오류 발생시 기본 한국어 라벨 사용
       setState(() {
         _labels = {
@@ -279,7 +279,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          
+
                           // 오늘 접속 라벨
                           Expanded(
                             child: Text(
@@ -293,7 +293,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          
+
                           // 전체 접속 라벨 (누락된 부분 추가)
                           Expanded(
                             child: Text(

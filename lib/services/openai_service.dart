@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 
 class OpenAIService {
   static Future<String> generatePrayer(
@@ -10,18 +11,18 @@ class OpenAIService {
     String bibleVerse,
   ) async {
     try {
-      print(
+      debugPrint(
         'Generating prayer for emotion: $emotion, input: $userInput, lang: $languageCode, verse: $bibleVerse',
       );
 
       // Load API key from environment variables
       final apiKey = dotenv.env['OPENAI_API_KEY'];
       if (apiKey == null || apiKey.isEmpty) {
-        print('Error: OpenAI API key is not set');
+        debugPrint('Error: OpenAI API key is not set');
         throw Exception('OpenAI API key is not configured');
       }
 
-      print('Making API request to OpenAI...');
+      debugPrint('Making API request to OpenAI...');
       // Prepare the request
       final response = await http.post(
         Uri.parse('https://api.openai.com/v1/chat/completions'),
@@ -48,48 +49,50 @@ class OpenAIService {
         }),
       );
 
-      print('Received response with status code: ${response.statusCode}');
+      debugPrint('Received response with status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         // Decode response body using UTF-8
         final decodedBody = utf8.decode(response.bodyBytes);
-        print('OpenAI Response Decoded Body: $decodedBody');
+        debugPrint('OpenAI Response Decoded Body: $decodedBody');
 
         final data = jsonDecode(decodedBody) as Map<String, dynamic>;
 
         // Defensive null checks
         if (data['choices'] == null || data['choices'].isEmpty) {
-          print('Error: No choices returned by OpenAI');
-          print('Response data: $data');
+          debugPrint('Error: No choices returned by OpenAI');
+          debugPrint('Response data: $data');
           throw Exception('No choices returned by OpenAI');
         }
 
         final message = data['choices'][0]?['message'];
         if (message == null || message is! Map) {
-          print('Error: No valid message object found in the first choice');
-          print('First choice data: ${data['choices'][0]}');
+          debugPrint(
+            'Error: No valid message object found in the first choice',
+          );
+          debugPrint('First choice data: ${data['choices'][0]}');
           throw Exception('No valid message object in the first choice');
         }
 
         final content = message['content'];
         if (content == null || content is! String) {
-          print('Error: No valid message content returned by OpenAI');
-          print('Message data: $message');
+          debugPrint('Error: No valid message content returned by OpenAI');
+          debugPrint('Message data: $message');
           throw Exception('No valid message content returned');
         }
 
         final generatedText = content;
-        print('Successfully generated prayer text (UTF-8 decoded)');
+        debugPrint('Successfully generated prayer text (UTF-8 decoded)');
         return generatedText;
       } else {
-        print('API Error: ${response.statusCode}\nBody: ${response.body}');
+        debugPrint('API Error: ${response.statusCode}\nBody: ${response.body}');
         throw Exception(
           'API request failed with status: ${response.statusCode}',
         );
       }
     } catch (e, stackTrace) {
-      print('Error generating prayer: $e');
-      print('Stack trace: $stackTrace');
+      debugPrint('Error generating prayer: $e');
+      debugPrint('Stack trace: $stackTrace');
       // Re-throw the exception to be caught in the UI layer
       rethrow;
     }
