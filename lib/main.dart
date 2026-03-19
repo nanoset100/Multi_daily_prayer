@@ -18,15 +18,17 @@ void main() async {
   // 알림 서비스 초기화 (채널 등록)
   NotificationService.initialize();
 
-  // 통계 초기화 - 앱이 시작될 때 초기화
-  await StatsService.updateStatsOnAppOpen();
+  // 통계 초기화 - 비동기로 처리 (앱 시작 블로킹 방지)
+  StatsService.updateStatsOnAppOpen().catchError((_) {});
 
   // 알림 권한 요청 및 매일 오전 9시 기도 알림 스케줄링
-  final isAllowed = await AwesomeNotifications().isNotificationAllowed();
-  if (!isAllowed) {
-    await AwesomeNotifications().requestPermissionToSendNotifications();
-  }
-  await NotificationService.scheduleDailyPrayerNotification();
+  try {
+    final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+    if (!isAllowed) {
+      await AwesomeNotifications().requestPermissionToSendNotifications();
+    }
+    await NotificationService.scheduleDailyPrayerNotification();
+  } catch (_) {}
 
   runApp(const MyApp());
 }
