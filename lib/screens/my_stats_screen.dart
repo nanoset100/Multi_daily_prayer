@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import '../models/stats_model.dart';
 import '../services/stats_service.dart';
-import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
+import 'privacy_policy_screen.dart';
 
 class MyStatsScreen extends StatefulWidget {
   const MyStatsScreen({super.key});
@@ -15,7 +15,6 @@ class MyStatsScreen extends StatefulWidget {
 
 class _MyStatsScreenState extends State<MyStatsScreen> {
   StatsModel? _stats;
-  TimeOfDay? _selectedTime;
   bool _isLoading = true;
   Map<String, dynamic>? _labels = {};
   String selectedLanguage = 'ko'; // 기본 언어를 한국어로 설정
@@ -66,12 +65,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
       // SharedPreferences에 선택한 언어 저장 (앱 전체에서 일관성 유지)
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selectedLanguage', langCode);
-
-      print(
-        '✅ 스탯 화면 언어 설정: $langCode, labels: ${_labels?.keys.length ?? 0}개 로드됨',
-      );
     } catch (e) {
-      print('라벨 로딩 오류: $e');
       // 오류 발생시 기본 한국어 라벨 사용
       setState(() {
         _labels = {
@@ -92,39 +86,10 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
 
   Future<void> _loadStats() async {
     final stats = await StatsService.getStats();
-
-    if (stats.reminderTime != null) {
-      final timeParts = stats.reminderTime!.split(':');
-      _selectedTime = TimeOfDay(
-        hour: int.parse(timeParts[0]),
-        minute: int.parse(timeParts[1]),
-      );
-    }
-
     setState(() {
       _stats = stats;
       _isLoading = false;
     });
-  }
-
-  Future<void> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: _selectedTime ?? TimeOfDay.now(),
-    );
-
-    if (picked != null && picked != _selectedTime) {
-      setState(() {
-        _selectedTime = picked;
-      });
-
-      // Save the selected time
-      final timeString = '${picked.hour}:${picked.minute}';
-      await StatsService.setReminderTime(timeString);
-
-      // Reload stats to reflect changes
-      _loadStats();
-    }
   }
 
   @override
@@ -279,7 +244,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          
+
                           // 오늘 접속 라벨
                           Expanded(
                             child: Text(
@@ -293,7 +258,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          
+
                           // 전체 접속 라벨 (누락된 부분 추가)
                           Expanded(
                             child: Text(
@@ -316,7 +281,7 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
 
               const SizedBox(height: 16),
 
-              // Reminder Setting Section
+              // Reminder Setting Section (fixed 9 AM)
               Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -324,55 +289,44 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Row(
                     children: [
-                      Text(
-                        _labels?['reminder_setting_title'] ?? '매일 확인 시간 설정',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      const Icon(
+                        Icons.notifications_active,
+                        color: Color(0xFF9D50DD),
+                        size: 28,
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _labels?['reminder_description'] ??
-                            '매일 이 시간이 되면 심경 카드를 확인하는 것을 잊지 마세요.',
-                        style: TextStyle(color: Colors.grey[600], fontSize: 14),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Time Picker - 레이아웃 개선
-                      Row(
-                        children: [
-                          // 라벨
-                          Expanded(
-                            child: Text(
-                              _labels?['reminder_time'] ?? '확인 시간',
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _labels?['reminder_setting_title'] ?? '매일 기도 알림',
                               style: const TextStyle(
                                 fontSize: 16,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
-                          ),
-
-                          // 시간 표시 및 선택 버튼
-                          Text(
-                            _selectedTime != null
-                                ? _formatTimeOfDay(_selectedTime!)
-                                : '9:00 AM',
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+                            const SizedBox(height: 4),
+                            Text(
+                              _labels?['reminder_description'] ??
+                                  '매일 오전 9시에 기도 알림을 보내드립니다.',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 13,
+                              ),
                             ),
-                          ),
-
-                          // 시간 선택 아이콘
-                          IconButton(
-                            icon: const Icon(Icons.access_time),
-                            onPressed: () => _selectTime(context),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+                      const Text(
+                        '오전 9:00',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF9D50DD),
+                        ),
                       ),
                     ],
                   ),
@@ -452,6 +406,30 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+
+              // 개인정보 처리방침 링크
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const PrivacyPolicyScreen(),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    '개인정보 처리방침 · Privacy Policy',
+                    style: TextStyle(
+                      color: Colors.grey[500],
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 8),
             ],
           ),
         ),
@@ -487,10 +465,4 @@ class _MyStatsScreenState extends State<MyStatsScreen> {
     );
   }
 
-  String _formatTimeOfDay(TimeOfDay time) {
-    final now = DateTime.now();
-    final dt = DateTime(now.year, now.month, now.day, time.hour, time.minute);
-    final format = DateFormat.jm(); // 12-hour format with AM/PM
-    return format.format(dt);
-  }
 }

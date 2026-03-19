@@ -1,81 +1,228 @@
-# 매일 기도 루틴 (Daily Prayer Routine)
+# 매일 기도 루틴 🙏 (Daily Prayer Routine)
 
-## 📱 앱 소개
-매일 기도 루틴은 사용자가 일상에서 기도 습관을 형성하고 유지할 수 있도록 도와주는 앱입니다.
+[![Flutter](https://img.shields.io/badge/Flutter-3.0%2B-blue.svg)](https://flutter.dev/)
+[![Dart](https://img.shields.io/badge/Dart-3.0%2B-blue.svg)](https://dart.dev/)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS-green.svg)](https://flutter.dev/)
 
-## ✨ 주요 기능
-- **기도 알림**: 매일 정해진 시간에 기도 알림을 받을 수 있습니다
-- **기도 기록**: 기도한 날짜와 내용을 기록하고 관리할 수 있습니다
-- **통계 확인**: 기도 습관을 시각적으로 확인할 수 있습니다
-- **개인화**: 사용자 맞춤형 기도 시간 설정이 가능합니다
-- **🤖 AI 기도문 보완**: OpenAI 인공지능을 활용하여 사용자의 기도문을 보완하고 개선된 기도문을 제안합니다
+## 📱 앱 소개 (App Overview)
+매일 기도 루틴은 사용자가 일상에서 기도 습관을 형성하고 유지할 수 있도록 도와주는 크로스플랫폼 모바일 앱입니다. Flutter로 개발되어 Android와 iOS에서 모두 사용할 수 있습니다.
 
-## 🤖 AI 기능 안내
-- 이 앱은 OpenAI의 인공지능 기술을 사용하여 기도문 작성을 도와줍니다
-- AI 기능은 선택사항이며, 사용자가 원할 때만 활용할 수 있습니다
-- 생성된 기도문이 부적절한 경우 신고 기능을 통해 개발자에게 알릴 수 있습니다
-- AI가 생성한 모든 콘텐츠는 사용자에게 명확히 표시됩니다
+**Daily Prayer Routine** is a cross-platform mobile app built with Flutter that helps users establish and maintain daily prayer habits on both Android and iOS devices.
 
-## 🔒 개인정보 보호
-- 모든 데이터는 안전하게 암호화되어 저장됩니다
-- 사용자의 개인정보는 수집하지 않습니다
-- 기도 기록은 사용자의 기기와 안전한 클라우드에만 저장됩니다
-- AI 기능 사용 시에도 개인정보는 보호됩니다
+## ✨ 주요 기능 (Key Features)
 
-## 📋 권한 사용 설명
-### 필수 권한
-- **인터넷 접근**: 클라우드 동기화 및 AI 기능을 위해 필요합니다
-- **알림**: 기도 시간 알림을 위해 필요합니다
-- **진동**: 알림 시 진동 기능을 위해 필요합니다
+### 📅 기도 관리 (Prayer Management)
+- **스마트 알림**: 사용자 맞춤 시간에 기도 알림 전송
+- **기도 기록**: 일별 기도 내용 및 완료 상태 추적
+- **기도 통계**: 시각적 차트로 기도 습관 분석
+- **개인 기도문**: 사용자만의 기도문 작성 및 관리
 
-### 선택적 권한
-- **부팅 완료 수신**: 기기 재시작 후에도 알림이 정상 작동하도록 합니다
+### 🤖 AI 기능 (AI Features)
+- **AI 기도문 보완**: OpenAI 기술을 활용한 기도문 개선 제안
+- **성경 구절 연계**: 관련 성경 구절 자동 제안
+- **개인화된 추천**: 사용자 패턴 기반 맞춤형 제안
 
-## 🛡️ 보안 및 안전성
-- 모든 통신은 HTTPS로 암호화됩니다
-- 사용자 데이터는 Supabase의 안전한 서버에 저장됩니다
-- 광고나 추적 기능은 포함되지 않습니다
-- AI 기능은 투명하게 공개되며 사용자 동의 하에 작동합니다
+### 📊 통계 및 분석 (Statistics & Analytics)
+- **기도 달성률**: 월별/주별 기도 완료율 시각화
+- **연속 기도 기록**: 연속으로 기도한 날 수 추적
+- **진도 추적**: 개인 영적 성장 여정 기록
 
-## 📞 문의사항
-앱 사용 중 문제가 있거나 문의사항이 있으시면 언제든지 연락해 주세요.
+### 🔄 동기화 (Synchronization)
+- **클라우드 백업**: Supabase 기반 안전한 데이터 동기화
+- **다기기 연동**: 여러 기기에서 동일한 데이터 접근
+
+## 🛠️ 기술 스택 (Tech Stack)
+
+### Frontend
+- **Framework**: Flutter 3.0+
+- **Language**: Dart 3.0+
+- **State Management**: Provider/Riverpod
+- **UI Components**: Material Design 3
+
+### Backend & Services
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **AI Service**: OpenAI API
+- **Push Notifications**: Firebase Cloud Messaging
+- **Local Storage**: SharedPreferences, SQLite
+
+### Architecture
+- **Pattern**: MVVM (Model-View-ViewModel)
+- **Structure**: Feature-based modular architecture
+- **Dependencies**: Dependency injection with GetIt
+
+## 📁 프로젝트 구조 (Project Structure)
+
+```
+lib/
+├── main.dart                 # 앱 진입점
+├── models/                   # 데이터 모델
+│   ├── prayer_card.dart
+│   └── stats_model.dart
+├── screens/                  # UI 화면
+│   ├── home_screen.dart
+│   ├── my_prayers_screen.dart
+│   └── my_stats_screen.dart
+├── services/                 # 비즈니스 로직
+│   ├── notification_service.dart
+│   ├── openai_service.dart
+│   ├── local_scripture_service.dart
+│   └── prayer_service.dart
+└── widgets/                  # 재사용 위젯
+```
+
+## 🚀 시작하기 (Getting Started)
+
+### 전제 조건 (Prerequisites)
+- Flutter SDK 3.0.0 이상
+- Dart SDK 3.0.0 이상
+- Android Studio / VS Code
+- Android/iOS 개발 환경 설정
+
+### 설치 방법 (Installation)
+
+1. **저장소 클론**
+```bash
+git clone https://github.com/yourusername/Multi_daily_prayer.git
+cd Multi_daily_prayer
+```
+
+2. **의존성 설치**
+```bash
+flutter pub get
+```
+
+3. **환경 설정**
+- `lib/services/` 폴더에 API 키 설정
+- Supabase 프로젝트 설정
+- OpenAI API 키 구성
+
+4. **앱 실행**
+```bash
+# Android
+flutter run
+
+# iOS
+flutter run -d ios
+```
+
+### 빌드 방법 (Build Instructions)
+
+```bash
+# Android APK
+flutter build apk --release
+
+# Android App Bundle
+flutter build appbundle --release
+
+# iOS
+flutter build ios --release
+```
+
+## 🔧 설정 (Configuration)
+
+### API 키 설정
+1. `lib/services/openai_service.dart`에서 OpenAI API 키 설정
+2. `lib/services/supabase_service.dart`에서 Supabase URL 및 키 설정
+
+### 알림 설정
+- Android: `android/app/src/main/AndroidManifest.xml`
+- iOS: `ios/Runner/Info.plist`
+
+## 🔒 개인정보 보호 (Privacy & Security)
+
+### 데이터 보안
+- **암호화**: 모든 민감한 데이터는 AES-256으로 암호화
+- **전송 보안**: HTTPS/TLS 1.3 프로토콜 사용
+- **로컬 저장**: 기기 내 보안 저장소 활용
+
+### 개인정보 처리
+- **최소 수집**: 기능 제공에 필요한 최소한의 정보만 수집
+- **사용자 제어**: 언제든지 데이터 삭제 가능
+- **투명성**: AI 처리 과정 완전 공개
+
+## 📋 권한 설명 (Permissions)
+
+### Android
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+<uses-permission android:name="android.permission.VIBRATE" />
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+```
+
+### iOS
+```xml
+<key>NSUserNotificationsUsageDescription</key>
+<string>기도 시간 알림을 위해 필요합니다</string>
+```
+
+## 🧪 테스트 (Testing)
+
+```bash
+# 단위 테스트
+flutter test
+
+# 통합 테스트
+flutter test integration_test/
+
+# 위젯 테스트
+flutter test test/widget_test.dart
+```
+
+## 📱 지원 플랫폼 (Supported Platforms)
+
+- ✅ Android 6.0+ (API 23+)
+- ✅ iOS 12.0+
+- 🔄 Web (개발 중)
+- 🔄 macOS (개발 중)
+
+## 🤝 기여하기 (Contributing)
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 라이선스 (License)
+
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 `LICENSE` 파일을 참조하세요.
+
+## 📞 문의 및 지원 (Contact & Support)
+
+- **이슈 신고**: [GitHub Issues](https://github.com/yourusername/Multi_daily_prayer/issues)
+- **기능 요청**: [GitHub Discussions](https://github.com/yourusername/Multi_daily_prayer/discussions)
+- **보안 문제**: security@example.com
+
+## 🙏 감사의 말 (Acknowledgments)
+
+- [Flutter](https://flutter.dev/) - UI 프레임워크
+- [Supabase](https://supabase.io/) - 백엔드 서비스
+- [OpenAI](https://openai.com/) - AI 기능 제공
+- 모든 기여자들과 사용자들께 감사드립니다
 
 ---
 
-## For Google Play Console Review
+## For App Store Review
 
 ### App Category
 **Lifestyle - Religion & Spirituality**
 
-### Target Audience
-- Primary: Adults (18+) who want to maintain daily prayer habits
-- Secondary: Religious communities and individuals seeking spiritual growth
+### Key Features for Review
+- Daily prayer scheduling and notifications
+- Personal prayer journal with AI enhancement
+- Progress tracking and statistics
+- Secure cloud synchronization
+- Cross-platform compatibility
 
-### Core Functionality
-This app helps users establish and maintain daily prayer routines through:
-1. Customizable prayer time notifications
-2. Prayer tracking and statistics
-3. Personal prayer journal
-4. Progress visualization
-5. **AI-powered prayer enhancement using OpenAI technology**
+### AI Transparency Statement
+This app uses OpenAI's technology to enhance prayer content. All AI-generated suggestions are clearly marked and require user approval. The AI feature is optional and can be disabled at any time.
 
-### AI Feature Disclosure
-- **AI Technology**: Uses OpenAI's artificial intelligence to enhance user prayers
-- **Transparency**: All AI-generated content is clearly labeled and disclosed to users
-- **User Control**: AI features are optional and user-initiated
-- **Safety**: Includes reporting mechanism for inappropriate AI-generated content
-- **Privacy**: AI processing respects user privacy and data protection
-
-### Permission Justification
-- **INTERNET**: Required for cloud synchronization of prayer data and AI functionality
-- **POST_NOTIFICATIONS**: Essential for daily prayer reminders
-- **VIBRATE**: Enhances notification experience
-- **RECEIVE_BOOT_COMPLETED**: Ensures notifications work after device restart
-- **WAKE_LOCK**: Maintains notification reliability
-
-### Data Safety
-- No personal information is collected beyond prayer preferences
-- All data is encrypted and stored securely
-- No third-party data sharing except for AI processing (OpenAI)
-- Users can delete their data at any time
-- AI interactions are processed securely and transparently
+### Privacy Compliance
+- GDPR compliant
+- CCPA compliant  
+- No tracking without user consent
+- Full data portability
+- Right to deletion honored

@@ -64,7 +64,6 @@ class StatsService {
       return newStats;
     }
 
-    final lastVisitDate = DateTime.parse(lastVisit);
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     final yesterdayStr =
         "${yesterday.year}-${yesterday.month.toString().padLeft(2, '0')}-${yesterday.day.toString().padLeft(2, '0')}";

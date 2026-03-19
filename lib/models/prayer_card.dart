@@ -1,11 +1,13 @@
 class PrayerCard {
   final int id;
+  final String? date;
   final String? themeKo, themeEn, themeJa, themeZh, themeEs;
   final String? verseKo, verseEn, verseJa, verseZh, verseEs;
   final String? prayerKo, prayerEn, prayerJa, prayerZh, prayerEs;
 
   PrayerCard({
     required this.id,
+    this.date,
     this.themeKo,
     this.themeEn,
     this.themeJa,
@@ -26,6 +28,7 @@ class PrayerCard {
   factory PrayerCard.fromJson(Map<String, dynamic> json) {
     return PrayerCard(
       id: json['id'],
+      date: json['date'],
       themeKo: json['theme_ko'],
       themeEn: json['theme_en'],
       themeJa: json['theme_ja'],
@@ -47,6 +50,7 @@ class PrayerCard {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'date': date,
       'theme_ko': themeKo,
       'theme_en': themeEn,
       'theme_ja': themeJa,

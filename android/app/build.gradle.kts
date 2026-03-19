@@ -68,12 +68,10 @@ android {
         release {
             // 릴리스 빌드에 서명 설정 적용
             signingConfig = signingConfigs.getByName("release")
-            
-            // R8/ProGuard 설정 임시 비활성화 (빌드 안정성 우선)
-            isMinifyEnabled = false
-            isShrinkResources = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android.txt"),
+                getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
