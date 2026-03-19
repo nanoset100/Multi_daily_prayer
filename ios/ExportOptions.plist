@@ -12,8 +12,8 @@
     <true/>
     <key>provisioningProfiles</key>
     <dict>
-        <key>com.dailyprayer.routine</key>
-        <string>dailyprayer_appstore</string>
+        <key>com.nanoset.prayroutine</key>
+        <string>prayroutine_appstore</string>
     </dict>
 </dict>
 </plist>

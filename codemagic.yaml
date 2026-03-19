@@ -10,11 +10,11 @@ workflows:
       cocoapods: default
       ios_signing:
         distribution_type: app_store
-        bundle_identifier: com.dailyprayer.routine
+        bundle_identifier: com.nanoset.prayroutine
       groups:
         - daily_prayer
       vars:
-        BUNDLE_ID: "com.dailyprayer.routine"
+        BUNDLE_ID: "com.nanoset.prayroutine"
 
     scripts:
       - name: .env 파일 생성
