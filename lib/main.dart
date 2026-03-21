@@ -8,12 +8,25 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
 
-  await Supabase.initialize(
-    url: dotenv.env['SUPABASE_URL']!,
-    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
-  );
+  const fallbackUrl = 'https://sevdrykubdoynryfahjm.supabase.co';
+  const fallbackKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNldmRyeWt1YmRveW5yeWZhaGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDczODg0ODEsImV4cCI6MjA2Mjk2NDQ4MX0.ZkTQEVQrx6AlnKLQ0SVptP0nC8fPceWttiSeDzBp2NU';
+
+  String supabaseUrl = fallbackUrl;
+  String supabaseAnonKey = fallbackKey;
+
+  try {
+    await dotenv.load(fileName: ".env");
+    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? fallbackUrl;
+    supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY'] ?? fallbackKey;
+  } catch (_) {}
+
+  try {
+    await Supabase.initialize(
+      url: supabaseUrl,
+      anonKey: supabaseAnonKey,
+    );
+  } catch (_) {}
 
   // 알림 서비스 초기화 (채널 등록)
   NotificationService.initialize();
