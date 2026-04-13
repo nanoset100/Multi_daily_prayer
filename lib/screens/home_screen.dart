@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import '../services/openai_service.dart';
 import '../services/stats_service.dart';
+import '../services/notification_service.dart';
 import 'my_prayers_screen.dart';
 import 'my_stats_screen.dart';
 import '../models/prayer_card.dart';
@@ -53,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _fetchPrayerCards();
     _initLanguage();
     _updateStats(); // Initialize stats tracking
+    _requestNotificationPermission(); // 앱 렌더링 후 알림 권한 요청
   }
 
   @override
@@ -129,6 +132,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _updateStats() async {
     await StatsService.updateStatsOnAppOpen();
+  }
+
+  // 알림 권한 요청 (앱 렌더링 후 실행 - App Store 리젝 방지)
+  Future<void> _requestNotificationPermission() async {
+    try {
+      final isAllowed = await AwesomeNotifications().isNotificationAllowed();
+      if (!isAllowed) {
+        await AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+      await NotificationService.scheduleDailyPrayerNotification();
+    } catch (_) {}
   }
 
   // 앱 시작 시 언어 설정 초기화

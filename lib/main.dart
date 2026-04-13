@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:awesome_notifications/awesome_notifications.dart';
 import 'screens/home_screen.dart';
 import 'services/notification_service.dart';
 import 'services/stats_service.dart';
@@ -28,20 +27,11 @@ void main() async {
     );
   } catch (_) {}
 
-  // 알림 서비스 초기화 (채널 등록)
+  // 알림 서비스 초기화 (채널 등록만 - 권한 요청은 앱 렌더링 후)
   NotificationService.initialize();
 
   // 통계 초기화 - 비동기로 처리 (앱 시작 블로킹 방지)
   StatsService.updateStatsOnAppOpen().catchError((_) {});
-
-  // 알림 권한 요청 및 매일 오전 9시 기도 알림 스케줄링
-  try {
-    final isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) {
-      await AwesomeNotifications().requestPermissionToSendNotifications();
-    }
-    await NotificationService.scheduleDailyPrayerNotification();
-  } catch (_) {}
 
   runApp(const MyApp());
 }
