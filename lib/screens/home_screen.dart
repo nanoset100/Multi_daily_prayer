@@ -431,6 +431,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 _isGenerating
                                     ? null
                                     : () async {
+                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      
                                       if (_prayerController.text.isEmpty) {
                                         _showMessage(
                                           _labels?['input_prayer_placeholder'] ??

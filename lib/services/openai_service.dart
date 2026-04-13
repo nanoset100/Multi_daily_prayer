@@ -15,6 +15,9 @@ class OpenAIService {
         'languageCode': languageCode,
         'bibleVerse': bibleVerse,
       },
+    ).timeout(
+      const Duration(seconds: 25),
+      onTimeout: () => throw Exception('응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.'),
     );
 
     if (response.data == null) {
