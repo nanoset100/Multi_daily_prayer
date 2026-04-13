@@ -713,12 +713,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ],
                                               ),
                                         );
-                                      } catch (e) {
-                                        _showMessage(
-                                          _labels?['ai_help_button'] ??
-                                              '기도문 생성 오류: $e',
-                                        );
-                                      } finally {
+                                        } catch (e) {
+                                          String errorText = e.toString();
+                                          if (errorText.startsWith('Exception: ')) {
+                                            errorText = errorText.substring('Exception: '.length);
+                                          }
+                                          if (mounted) {
+                                            showDialog(
+                                              context: context,
+                                              builder: (ctx) => AlertDialog(
+                                                title: Text(selectedLanguage == 'ko' ? '알림' : 'Notice'),
+                                                content: Text(
+                                                  selectedLanguage == 'ko'
+                                                      ? '기도문 생성에 실패했습니다. 잠시 후 다시 시도해주세요.\n\n상세 오류: $errorText'
+                                                      : 'Failed to generate prayer. Please try again later.\n\nError details: $errorText',
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () => Navigator.of(ctx).pop(),
+                                                    child: Text(selectedLanguage == 'ko' ? '확인' : 'OK'),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          }
+                                        } finally {
                                         if (mounted) {
                                           setState(() {
                                             _isGenerating = false;
