@@ -718,6 +718,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           if (errorText.startsWith('Exception: ')) {
                                             errorText = errorText.substring('Exception: '.length);
                                           }
+                                          // API 또는 FunctionException 오류 일 경우 사용자 친화적인 메시지로 대체 (Apple App Store 리젝 사유 방어)
+                                          if (errorText.contains('FunctionException') || errorText.contains('API key') || errorText.contains('OpenAI')) {
+                                            errorText = selectedLanguage == 'ko' 
+                                                ? '일시적인 서버 연결 오류가 발생했습니다.'
+                                                : 'A temporary server connection error occurred.';
+                                          }
                                           if (mounted) {
                                             showDialog(
                                               context: context,

@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze:*)",
+      "Bash(cmd //c \"del /f \\\\\"M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer\\\\\\\\.git\\\\\\\\index.lock\\\\\"\")",
+      "Bash(tasklist)",
+      "Bash(powershell -Command \"Test-Path 'M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer\\\\\\\\.git\\\\\\\\index.lock'\")",
+      "Bash(powershell -Command \"Get-ChildItem 'M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer\\\\\\\\.git\\\\\\\\' -Filter '*.lock' -Recurse\")",
+      "Bash(powershell -Command \"New-Item -Path 'M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer\\\\\\\\.git\\\\\\\\index.lock' -ItemType File -Force | Remove-Item -Force\")",
+      "Bash(powershell -Command \"& { Remove-Item 'M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer\\\\\\\\.git\\\\\\\\index.lock' -Force -ErrorAction SilentlyContinue; cd 'M:\\\\\\\\MyProject - new\\\\\\\\Multi_daily_prayer'; git add lib/main.dart lib/screens/home_screen.dart; git commit -m 'fix: move notification permission request after app rendering to prevent blank screen' }\")",
+      "Bash(powershell -Command '& { cd '\\\\''M:\\\\MyProject - new\\\\Multi_daily_prayer'\\\\''; git add pubspec.yaml; git commit -m '\\\\''chore: bump version to 1.0.17+119 for App Store resubmission:*)"
+    ]
+  }
+}
